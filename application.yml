@@ -1,0 +1,10 @@
+## Billing Converter
+
+######
+# Servers
+# Syntax: SERVER_IP,USER,PASSWORD,[DATABASE],[PORT]
+
+config:
+  servers:
+    - 192.168.0.2,root,advah310755
+    - 192.168.0.188,root,advah310755
