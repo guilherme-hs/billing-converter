@@ -6,8 +6,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.ImportResource;
-
-import java.rmi.Remote;
+import java.util.List;
 
 @SpringBootApplication
 @ImportResource("file:config.xml")
@@ -20,7 +19,11 @@ public class BillingConverterApplication {
     public static void main(String[] args) {
         ctx = SpringApplication.run(BillingConverterApplication.class, args);
         logger.info("Billing Converter Started...");
-        RemoteServer server1 = ctx.getBean("server1",RemoteServer.class);
+        List<RemoteServer> remoteServers = ctx.getBean("remoteServers",List.class);
+        logger.info("Servers pooling:");
+        for (RemoteServer remoteServer : remoteServers) {
+            logger.info(remoteServer.getName()+"("+remoteServer.getAddress()+")");
+        }
         logger.info("Stopping Billing Converter...");
     }
 

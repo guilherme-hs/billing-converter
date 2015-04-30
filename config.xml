@@ -1,9 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+            http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
 
-    <bean class="com.tenacity.billing.RemoteServer" name="server1">
-
+    <bean class="com.tenacity.billing.RemoteServer" id="tenacity">
+        <property name="name" value="tenacity - Pysix"></property>
+        <property name="address" value="192.168.0.2"></property>
+        <property name="username" value="root"></property>
+        <property name="password" value="advah310755"></property>
+        <property name="database" value="asteriskcdrdb"></property>
+        <property name="port" value="3306"></property>
+        <property name="table" value="cdr"></property>
     </bean>
+
+    <bean class="com.tenacity.billing.RemoteServer" id="tenacity-gsm">
+        <property name="name" value="tenacity - GSM Gateway"></property>
+        <property name="address" value="192.168.0.188"></property>
+        <property name="username" value="root"></property>
+        <property name="password" value="advah310755"></property>
+        <property name="database" value="asteriskcdrdb"></property>
+        <property name="port" value="3306"></property>
+        <property name="table" value="cdr"></property>
+    </bean>
+
+
+    <util:list id="remoteServers" value-type="com.tenacity.billing.RemoteServer">
+        <ref bean="tenacity"/>
+        <ref bean="tenacity-gsm"/>
+    </util:list>
 </beans>
