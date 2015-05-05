@@ -5,6 +5,8 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
             http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
 
+    <!--Servers to collect-->
+
     <bean class="com.tenacity.billing.RemoteServer" id="tenacity">
         <property name="name" value="tenacity - Pysix"></property>
         <property name="address" value="192.168.0.2"></property>
@@ -13,6 +15,7 @@
         <property name="database" value="asteriskcdrdb"></property>
         <property name="port" value="3306"></property>
         <property name="table" value="cdr"></property>
+        <property name="numberMap" ref="defaultNumberMap"></property>
     </bean>
 
     <bean class="com.tenacity.billing.RemoteServer" id="tenacity-gsm">
@@ -26,8 +29,21 @@
     </bean>
 
 
+    <!--bean that will contain the servers-->
     <util:list id="remoteServers" value-type="com.tenacity.billing.RemoteServer">
         <ref bean="tenacity"/>
         <ref bean="tenacity-gsm"/>
     </util:list>
+
+
+
+    <util:map id="defaultRamal" value-type="java.lang.String">
+        <entry key="regex" value="^([0-9*#]{4})$"></entry>
+        <entry key="type" value="INTERNAL"></entry>
+    </util:map>
+
+    <util:list id="defaultNumberMap" value-type="java.util.Map">
+        <ref bean="defaultRamal"></ref>
+    </util:list>
+
 </beans>

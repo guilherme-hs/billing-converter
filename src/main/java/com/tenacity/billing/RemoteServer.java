@@ -2,7 +2,8 @@ package com.tenacity.billing;
 
 import com.google.common.base.Objects;
 
-import java.net.Inet4Address;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Represents a remote server
@@ -29,6 +30,8 @@ public class RemoteServer {
 
     //table to use the application
     private String table = "asteriskcdrdb";
+
+    private List<Map<String,String>> numberMap;
 
     public String getName() {
         return name;
@@ -84,6 +87,14 @@ public class RemoteServer {
 
     public void setTable(String table) {
         this.table = table;
+    }
+
+    public List<Map<String, String>> getNumberMap() {
+        return numberMap;
+    }
+
+    public void setNumberMap(List<Map<String, String>> numberMap) {
+        this.numberMap = numberMap;
     }
 
     @Override
