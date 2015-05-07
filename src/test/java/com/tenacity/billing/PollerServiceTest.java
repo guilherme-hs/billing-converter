@@ -1,6 +1,6 @@
 package com.tenacity.billing;
 
-import com.tenacity.sopho.domain.SophoCall;
+import com.tenacity.sopho.domain.*;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -33,6 +33,8 @@ public class PollerServiceTest {
     public static final String DEFAULT_CDR_TABLE = "cdr";
     public static final int INITIAL_ID = 0;
     public static final String INITIAL_REFERENCE_NUMBER = "0100";
+    public static final String SECOND_REFERENCE_NUMBER = "0102";
+    public static final int DEFAULT_ISBC = 14;
     @Autowired
     protected PollerService pollerService;
 
@@ -179,7 +181,111 @@ public class PollerServiceTest {
     public void internalToDDDTest() throws Exception{
         List<SophoCall> sophoCalls = pollerService.getBilling(
                 connection,DEFAULT_CDR_TABLE,INITIAL_ID,remoteServers.get(0).getNumberMap());
-        assertThat(sophoCalls.get(0).getDate(), equalTo(new Date(114, Calendar.APRIL, 27, 16, 48)));
-        assertThat(sophoCalls.get(0).getReferenceNumber(), equalTo(INITIAL_REFERENCE_NUMBER));
+        SophoCall firstCall = sophoCalls.get(0);
+        assertThat(firstCall.getDate(), equalTo(new Date(114, Calendar.APRIL, 27, 16, 48)));
+        assertThat(firstCall.getReferenceNumber(), equalTo(INITIAL_REFERENCE_NUMBER));
+        assertThat(sophoCalls.get(1).getReferenceNumber(), equalTo(SECOND_REFERENCE_NUMBER));
+        assertThat(firstCall.getPartyAtype(), equalTo(SophoPartyType.EXTENSION));
+        assertThat(firstCall.getPartyAFarEnd(), equalTo("6108"));
+        assertThat(firstCall.getPartyALine(), equalTo(null));
+        assertThat(firstCall.getPartyARoute(), equalTo(null));
+        assertThat(firstCall.getPartyBtype(), equalTo(SophoPartyType.PSTN));
+        assertThat(firstCall.getPartyBFarEnd(), equalTo(""));
+        assertThat(firstCall.getDestination(), equalTo("0313732318000"));
+        assertThat(firstCall.getPartyBRoute(), equalTo("000"));
+        assertThat(firstCall.getPartyBLine(), equalTo("0001"));
+        assertThat(firstCall.getIbsc(), equalTo(DEFAULT_ISBC));
+        assertThat(firstCall.isAnsweredStatus(),equalTo(true));
+        assertThat(firstCall.isNonPreferedRoute(), equalTo(false));
+        assertThat(firstCall.getMeteringPulses(), equalTo(0));
     }
+
+    @Test
+    public void internalToLocalTest() throws Exception{
+        List<SophoCall> sophoCalls = pollerService.getBilling(
+                connection,DEFAULT_CDR_TABLE,INITIAL_ID,remoteServers.get(0).getNumberMap());
+        SophoCall firstCall = sophoCalls.get(7);
+        assertThat(firstCall.getDate(), equalTo(new Date(115, Calendar.APRIL, 29,8, 35)));
+        assertThat(firstCall.getReferenceNumber(), equalTo("0114"));
+        assertThat(firstCall.getPartyAtype(), equalTo(SophoPartyType.EXTENSION));
+        assertThat(firstCall.getPartyAFarEnd(), equalTo("6111"));
+        assertThat(firstCall.getPartyALine(), equalTo(null));
+        assertThat(firstCall.getPartyARoute(), equalTo(null));
+        assertThat(firstCall.getPartyBtype(), equalTo(SophoPartyType.PSTN));
+        assertThat(firstCall.getPartyBFarEnd(), equalTo(""));
+        assertThat(firstCall.getDestination(), equalTo("30259500"));
+        assertThat(firstCall.getPartyBRoute(), equalTo("000"));
+        assertThat(firstCall.getPartyBLine(), equalTo("0001"));
+        assertThat(firstCall.getIbsc(), equalTo(DEFAULT_ISBC));
+        assertThat(firstCall.isAnsweredStatus(),equalTo(true));
+        assertThat(firstCall.isNonPreferedRoute(), equalTo(false));
+        assertThat(firstCall.getMeteringPulses(), equalTo(0));
+    }
+
+    @Test
+    public void InternalAndDDDReplacementTest() throws Exception{
+        List<SophoCall> sophoCalls = pollerService.getBilling(
+                connection,DEFAULT_CDR_TABLE,INITIAL_ID,remoteServers.get(1).getNumberMap());
+        SophoCall firstCall = sophoCalls.get(0);
+        assertThat(firstCall.getPartyAtype(), equalTo(SophoPartyType.EXTENSION));
+        assertThat(firstCall.getPartyAFarEnd(), equalTo("9608"));
+        assertThat(firstCall.getPartyALine(), equalTo(null));
+        assertThat(firstCall.getPartyARoute(), equalTo(null));
+        assertThat(firstCall.getPartyBtype(), equalTo(SophoPartyType.PSTN));
+        assertThat(firstCall.getPartyBFarEnd(), equalTo(""));
+        assertThat(firstCall.getDestination(), equalTo("0213732318000"));
+        assertThat(firstCall.getPartyBRoute(), equalTo("001"));
+        assertThat(firstCall.getPartyBLine(), equalTo("1000"));
+    }
+
+    @Test
+    public void dispositionTest() throws Exception{
+        List<SophoCall> sophoCalls = pollerService.getBilling(
+                connection,DEFAULT_CDR_TABLE,INITIAL_ID,remoteServers.get(0).getNumberMap());
+        assertThat(sophoCalls.get(0).isAnsweredStatus(), equalTo(true));
+        assertThat(sophoCalls.get(1).isAnsweredStatus(), equalTo(false));
+        assertThat(sophoCalls.get(2).isAnsweredStatus(), equalTo(false));
+        assertThat(sophoCalls.get(4).isAnsweredStatus(), equalTo(false));
+
+        assertThat(sophoCalls.get(0).getAnswerDelay(), equalTo(0));
+        assertThat(sophoCalls.get(1).getAnswerDelay(), equalTo(0));
+        assertThat(sophoCalls.get(2).getAnswerDelay(), equalTo(33));
+        assertThat(sophoCalls.get(4).getAnswerDelay(), equalTo(0));
+        assertThat(sophoCalls.get(9).getAnswerDelay(), equalTo(9));
+
+        assertThat(sophoCalls.get(0).isAnsweredStatus(), equalTo(true));
+        assertThat(sophoCalls.get(1).isAnsweredStatus(), equalTo(false));
+        assertThat(sophoCalls.get(2).isAnsweredStatus(), equalTo(false));
+        assertThat(sophoCalls.get(4).isAnsweredStatus(), equalTo(false));
+
+        assertThat(sophoCalls.get(0).getAnswerDelayType(), equalTo(SophoAnswerDelayType.BOTH));
+        assertThat(sophoCalls.get(1).getAnswerDelayType(), equalTo(SophoAnswerDelayType.BOTH));
+        assertThat(sophoCalls.get(2).getAnswerDelayType(), equalTo(SophoAnswerDelayType.BOTH));
+        assertThat(sophoCalls.get(4).getAnswerDelayType(), equalTo(SophoAnswerDelayType.BOTH));
+    }
+
+    @Test
+    public void durationTest() throws Exception{
+        List<SophoCall> sophoCalls = pollerService.getBilling(
+                connection,DEFAULT_CDR_TABLE,INITIAL_ID,remoteServers.get(0).getNumberMap());
+        assertThat(sophoCalls.get(0).getCallDuration(), equalTo(5));
+        assertThat(sophoCalls.get(2).getCallDuration(), equalTo(33));
+        assertThat(sophoCalls.get(10).getCallDuration(), equalTo(36));
+    }
+
+    @Test
+    public void pidTest() throws Exception{
+                List<SophoCall> sophoCalls = pollerService.getBilling(
+                        connection,DEFAULT_CDR_TABLE,INITIAL_ID,remoteServers.get(0).getNumberMap());
+        assertThat(sophoCalls.get(0).getPasswordIndication(), equalTo(SophoPasswordIndication.NORMAL_CALL));
+
+        assertThat(sophoCalls.get(0).getCostCentreType(), equalTo(SophoCostCentreType.PID));
+        assertThat(sophoCalls.get(0).getCostCentre(), equalTo("22401"));
+        assertThat(sophoCalls.get(1).getCostCentreType(), equalTo(SophoCostCentreType.PID));
+        assertThat(sophoCalls.get(1).getCostCentre(), equalTo("22401"));
+        assertThat(sophoCalls.get(2).getCostCentreType(), equalTo(SophoCostCentreType.NO_COST_CENTRE));
+        assertThat(sophoCalls.get(9).getCostCentreType(), equalTo(SophoCostCentreType.NO_COST_CENTRE));
+    }
+
+
 }

@@ -31,7 +31,11 @@ public class RemoteServer {
     //table to use the application
     private String table = "asteriskcdrdb";
 
+    //maps the numbers to sopho types
     private List<Map<String,String>> numberMap;
+
+    //default map if no map found
+    private Map<String,String> defaultMap;
 
     public String getName() {
         return name;
@@ -95,6 +99,14 @@ public class RemoteServer {
 
     public void setNumberMap(List<Map<String, String>> numberMap) {
         this.numberMap = numberMap;
+    }
+
+    public Map<String, String> getDefaultMap() {
+        return defaultMap;
+    }
+
+    public void setDefaultMap(Map<String, String> defaultMap) {
+        this.defaultMap = defaultMap;
     }
 
     @Override

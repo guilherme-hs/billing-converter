@@ -1,6 +1,6 @@
 package com.tenacity.billing;
 
-import com.tenacity.sopho.domain.SophoCall;
+import com.tenacity.sopho.domain.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +23,7 @@ public class PollerService {
     public static final int INITIAL_REFERENCE_NUMBER = 100;
     public static final int MAX_REFERENCE_NUMBER = 199;
     public static final int NO_SECONDS = 0;
+    public static final int DEFAULT_IBSC = 14;
     private boolean stop = true;
 
     protected int max_registries=1000;
@@ -81,7 +82,82 @@ public class PollerService {
                     referenceNumber = INITIAL_REFERENCE_NUMBER;
                 }
                 sophoCall.setReferenceNumber(referenceNumberFormatter.format(referenceNumber));
+
+
+                boolean srcRegexFound = false;
+                //tests the type of the src
+                String sophoCallSrc = resultSet.getString("src");
+                for (Map<String, String> rules : numberMap) {
+                    if(!srcRegexFound){
+                        if(sophoCallSrc.matches(rules.get("regex"))){
+                            sophoCall.setPartyAtype(SophoPartyType.valueOf(rules.get("type")));
+                            if(rules.get("replacement")!=null){
+                                sophoCall.setPartyAFarEnd(
+                                        sophoCallSrc.replaceAll(rules.get("regex"),rules.get("replacement")));
+                            }else{
+                                sophoCall.setPartyAFarEnd(sophoCallSrc);
+                            }
+                        }
+                    }
+                }
+
+                boolean dstRegexFound = false;
+                //tests the type of the src
+                String sophoCallDst = resultSet.getString("dst");
+                for (Map<String, String> rules : numberMap) {
+                    if(!dstRegexFound){
+                        if(sophoCallDst.matches(rules.get("regex"))){
+                            sophoCall.setPartyBtype(SophoPartyType.valueOf(rules.get("type")));
+                            if(rules.get("replacement")!=null){
+                                sophoCall.setPartyBFarEnd(
+                                        sophoCallDst.replaceAll(rules.get("regex"), rules.get("replacement")));
+                            }else{
+                                sophoCall.setPartyBFarEnd(sophoCallDst);
+                            }
+                            if(sophoCall.getPartyBtype().equals(SophoPartyType.PSTN)){
+                                sophoCall.setDestination(sophoCall.getPartyBFarEnd());
+                                sophoCall.setPartyBFarEnd("");
+                                if(rules.get("route") == null){
+                                    sophoCall.setPartyBRoute("000");
+                                }else{
+                                    sophoCall.setPartyBRoute(rules.get("route"));
+                                }
+                                if(rules.get("line") == null){
+                                    sophoCall.setPartyBLine("0001");
+                                }else{
+                                    sophoCall.setPartyBLine(rules.get("line"));
+                                }
+                            }
+                        }
+                    }
+                }
+
+                sophoCall.setIbsc(DEFAULT_IBSC);
+                int billsec = resultSet.getInt("billsec");
+                int duration = resultSet.getInt("duration");
+
+                if(resultSet.getString("disposition").equals("ANSWERED")){
+                    sophoCall.setAnsweredStatus(true);
+                }
+                if(resultSet.getString("disposition").equals("ANSWERED") ||
+                        resultSet.getString("disposition").equals("NO ANSWER")){
+                    sophoCall.setAnswerDelay(duration-billsec);
+                    sophoCall.setCallDuration(duration);
+                    sophoCall.setConversationDuration(billsec);
+                }
+
+                sophoCall.setAnswerDelayType(SophoAnswerDelayType.BOTH);
+                sophoCall.setPasswordIndication(SophoPasswordIndication.NORMAL_CALL);
+
+                String accountCode = resultSet.getString("accountcode");
+                if( accountCode!= null && !accountCode.isEmpty()){
+                    sophoCall.setCostCentreType(SophoCostCentreType.PID);
+                    sophoCall.setCostCentre(resultSet.getString("accountcode"));
+                }else{
+                    sophoCall.setCostCentreType(SophoCostCentreType.NO_COST_CENTRE);
+                }
                 returnValue.add(sophoCall);
+                referenceNumber += 2;
             }
             return returnValue;
         } catch (SQLException e) {

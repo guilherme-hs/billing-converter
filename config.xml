@@ -26,6 +26,7 @@
         <property name="database" value="asteriskcdrdb"></property>
         <property name="port" value="3306"></property>
         <property name="table" value="cdr"></property>
+        <property name="numberMap" ref="replaceNumberMap"></property>
     </bean>
 
 
@@ -37,13 +38,46 @@
 
 
 
-    <util:map id="defaultRamal" value-type="java.lang.String">
+    <util:map id="defaultExtension" value-type="java.lang.String">
         <entry key="regex" value="^([0-9*#]{4})$"></entry>
-        <entry key="type" value="INTERNAL"></entry>
+        <entry key="type" value="EXTENSION"></entry>
+    </util:map>
+
+    <util:map id="defaultDDD" value-type="java.lang.String">
+        <entry key="regex" value="^00([1-9]{2})(\d{10,11})$"></entry>
+        <entry key="type" value="PSTN"></entry>
+        <entry key="replacement" value="0$1$2"></entry>
+    </util:map>
+
+    <util:map id="defaultLocal" value-type="java.lang.String">
+        <entry key="regex" value="^0([0-9*#]{8,9})$"></entry>
+        <entry key="type" value="PSTN"></entry>
+        <entry key="replacement" value="$1"></entry>
+    </util:map>
+
+    <util:map id="replaceExtension" value-type="java.lang.String">
+        <entry key="regex" value="^61([0-9*#]{2})$"></entry>
+        <entry key="type" value="EXTENSION"></entry>
+        <entry key="replacement" value="96$1"></entry>
+    </util:map>
+
+    <util:map id="replaceDDD" value-type="java.lang.String">
+        <entry key="regex" value="^00([1-9]{2})(\d{10,11})$"></entry>
+        <entry key="type" value="PSTN"></entry>
+        <entry key="replacement" value="021$2"></entry>
+        <entry key="route" value="001"></entry>
+        <entry key="line" value="1000"></entry>
     </util:map>
 
     <util:list id="defaultNumberMap" value-type="java.util.Map">
-        <ref bean="defaultRamal"></ref>
+        <ref bean="defaultExtension"></ref>
+        <ref bean="defaultDDD"></ref>
+        <ref bean="defaultLocal"></ref>
+    </util:list>
+
+    <util:list id="replaceNumberMap" value-type="java.util.Map">
+        <ref bean="replaceExtension"></ref>
+        <ref bean="replaceDDD"></ref>
     </util:list>
 
 </beans>
