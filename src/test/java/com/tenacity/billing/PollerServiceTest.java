@@ -32,7 +32,7 @@ public class PollerServiceTest {
     public static final String SECOND_REFERENCE_NUMBER = "0102";
     public static final int DEFAULT_ISBC = 14;
     @Autowired
-    protected PollerService pollerService;
+    protected PollerServiceImpl pollerService;
 
     @Autowired
 //    @Qualifier("defaultNumberMap")
