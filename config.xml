@@ -55,6 +55,12 @@
         <entry key="replacement" value="$1"></entry>
     </util:map>
 
+    <util:map id="defaultCallerId" value-type="java.lang.String">
+        <entry key="regex" value="^([1-9][1-9][0-9]{8,9})$"></entry>
+        <entry key="type" value="PSTN"></entry>
+        <entry key="replacement" value="$1"></entry>
+    </util:map>
+
     <util:map id="replaceExtension" value-type="java.lang.String">
         <entry key="regex" value="^61([0-9*#]{2})$"></entry>
         <entry key="type" value="EXTENSION"></entry>
@@ -73,6 +79,7 @@
         <ref bean="defaultExtension"></ref>
         <ref bean="defaultDDD"></ref>
         <ref bean="defaultLocal"></ref>
+        <ref bean="defaultCallerId"></ref>
     </util:list>
 
     <util:list id="replaceNumberMap" value-type="java.util.Map">

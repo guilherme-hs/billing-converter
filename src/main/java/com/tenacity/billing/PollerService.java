@@ -97,6 +97,20 @@ public class PollerService {
                             }else{
                                 sophoCall.setPartyAFarEnd(sophoCallSrc);
                             }
+                            if(sophoCall.getPartyAtype().equals(SophoPartyType.PSTN)){
+                                sophoCall.setPartyAFarEnd(sophoCallSrc);
+                                if(rules.get("route") == null){
+                                    sophoCall.setPartyARoute("000");
+                                }else{
+                                    sophoCall.setPartyARoute(rules.get("route"));
+                                }
+                                if(rules.get("line") == null){
+                                    sophoCall.setPartyALine("0001");
+                                }else{
+                                    sophoCall.setPartyALine(rules.get("line"));
+                                }
+                            }
+
                         }
                     }
                 }
@@ -104,6 +118,7 @@ public class PollerService {
                 boolean dstRegexFound = false;
                 //tests the type of the src
                 String sophoCallDst = resultSet.getString("dst");
+                String userfield;
                 for (Map<String, String> rules : numberMap) {
                     if(!dstRegexFound){
                         if(sophoCallDst.matches(rules.get("regex"))){
@@ -127,6 +142,13 @@ public class PollerService {
                                 }else{
                                     sophoCall.setPartyBLine(rules.get("line"));
                                 }
+                                userfield = resultSet.getString("userfield");
+                                logger.info("Userfield:"+userfield);
+                                if(userfield.equalsIgnoreCase("\"P\"")){
+                                    logger.info("Setting pivate call...");
+                                    sophoCall.setPrivateCall(true);
+                                }
+
                             }
                         }
                     }

@@ -8,22 +8,18 @@ import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.Mockito.*;
 
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -94,14 +90,14 @@ public class PollerServiceTest {
                 ") ENGINE=MyISAM DEFAULT CHARSET=latin1;");
         statement.execute("INSERT INTO `cdr` VALUES " +
                 "(1575,'2014-04-27 16:48:29','6108','6108','00313732318000','OUT_LOCAL2','SIP/6108-0000092e','','Playback','invalido',5,5,'ANSWERED',3,'22401','1430164109.3023','',NULL,NULL)," +
-                "(1671,'2015-04-29 08:26:03','6111','6111','035229540','OUT_LOCAL2','SIP/6111-000009ba','Khomp/B0C0-0.0','Hangup','',2,0,'FAILED',3,'22401','1430306763.3223','\\\"B\\\"',NULL,NULL)," +
+                "(1671,'2015-04-29 08:26:03','6111','6111','035229540','OUT_LOCAL2','SIP/6111-000009ba','Khomp/B0C0-0.0','Hangup','',2,0,'FAILED',3,'22401','1430306763.3223','\\\"P\\\"',NULL,NULL)," +
                 "(1672,'2015-04-29 08:26:19','6110','6110','4377','OUT_LOCAL','SIP/6110-000009bb','SIP/288-000009bc','Dial','Sip/288/4377,90,tT',33,0,'NO ANSWER',3,'','1430306779.3225','',NULL,NULL)," +
                 "(1673,'2015-04-29 08:29:15','6110','6110','4377','OUT_LOCAL','SIP/6110-000009bd','SIP/288-000009be','Dial','Sip/288/4377,90,tT',18,0,'NO ANSWER',3,'','1430306955.3227','',NULL,NULL)," +
                 "(1674,'2015-04-29 08:34:48','6108','6108','4376','OUT_LOCAL','SIP/6108-000009bf','SIP/288-000009c0','Dial','Sip/288/4376,90,tT',4,0,'BUSY',3,'','1430307288.3229','',NULL,NULL)," +
                 "(1675,'2015-04-29 08:34:58','6108','6108','4376','OUT_LOCAL','SIP/6108-000009c1','SIP/288-000009c2','Dial','Sip/288/4376,90,tT',4,0,'BUSY',3,'','1430307298.3231','',NULL,NULL)," +
                 "(1676,'2015-04-29 08:35:34','6108','6108','4376','OUT_LOCAL','SIP/6108-000009c4','SIP/288-000009c5','Dial','Sip/288/4376,90,tT',4,0,'BUSY',3,'','1430307334.3235','',NULL,NULL)," +
-                "(1677,'2015-04-29 08:35:11','6111','6111','030259500','OUT_LOCAL2','SIP/6111-000009c3','Khomp/B0C0-0.0','Dial','Khomp/b0l0/30259500,90,tT',83,68,'ANSWERED',3,'22401','1430307311.3233','\\\"B\\\"',NULL,NULL)," +
-                "(1678,'2015-04-29 08:36:49','6111','6111','035229540','OUT_LOCAL2','SIP/6111-000009c6','Khomp/B0C0-0.0','Hangup','',3,0,'FAILED',3,'22401','1430307409.3237','\\\"B\\\"',NULL,NULL)," +
+                "(1677,'2015-04-29 08:35:11','6111','6111','030259500','OUT_LOCAL2','SIP/6111-000009c3','Khomp/B0C0-0.0','Dial','Khomp/b0l0/30259500,90,tT',83,68,'ANSWERED',3,'22401','1430307311.3233','\\\"P\\\"',NULL,NULL)," +
+                "(1678,'2015-04-29 08:36:49','3134755794','3134755794','035229540','OUT_LOCAL2','SIP/6111-000009c6','Khomp/B0C0-0.0','Hangup','',3,0,'FAILED',3,'22401','1430307409.3237','\\\"B\\\"',NULL,NULL)," +
                 "(1679,'2015-04-29 08:39:56','6108','6108','4376','OUT_LOCAL','SIP/6108-000009c7','SIP/288-000009c8','Dial','Sip/288/4376,90,tT',129,120,'ANSWERED',3,'','1430307596.3239','',NULL,NULL)," +
 
                 "(1680,'2015-04-29 09:03:45','6109','6109','4272','INT_INTERNO','SIP/6109-000009c9','SIP/288-000009ca','Dial','Sip/288/4272,90,tT',36,30,'ANSWERED',3,'','1430309025.3241','',NULL,NULL)," +
@@ -223,6 +219,71 @@ public class PollerServiceTest {
     }
 
     @Test
+    public void internalToInternal() throws Exception{
+        List<SophoCall> sophoCalls = pollerService.getBilling(
+                connection,DEFAULT_CDR_TABLE,INITIAL_ID,remoteServers.get(0).getNumberMap());
+        SophoCall firstCall = sophoCalls.get(2);
+        assertThat(firstCall.getDate(), equalTo(new Date(115, Calendar.APRIL, 29,8, 26)));
+        assertThat(firstCall.getReferenceNumber(), equalTo("0104"));
+        assertThat(firstCall.getPartyAtype(), equalTo(SophoPartyType.EXTENSION));
+        assertThat(firstCall.getPartyAFarEnd(), equalTo("6110"));
+        assertThat(firstCall.getPartyALine(), equalTo(null));
+        assertThat(firstCall.getPartyARoute(), equalTo(null));
+        assertThat(firstCall.getPartyBtype(), equalTo(SophoPartyType.EXTENSION));
+        assertThat(firstCall.getPartyBFarEnd(), equalTo("4377"));
+        assertThat(firstCall.getPartyBRoute(), equalTo(null));
+        assertThat(firstCall.getPartyBLine(), equalTo(null));
+        assertThat(firstCall.getIbsc(), equalTo(DEFAULT_ISBC));
+        assertThat(firstCall.isAnsweredStatus(),equalTo(false));
+        assertThat(firstCall.isNonPreferedRoute(), equalTo(false));
+        assertThat(firstCall.getMeteringPulses(), equalTo(0));
+    }
+
+    @Test
+    public void ExternalToInternal() throws Exception{
+        List<SophoCall> sophoCalls = pollerService.getBilling(
+                connection,DEFAULT_CDR_TABLE,INITIAL_ID,remoteServers.get(0).getNumberMap());
+        SophoCall firstCall = sophoCalls.get(12);
+        assertThat(firstCall.getDate(), equalTo(new Date(115, Calendar.APRIL, 29,9, 10)));
+        assertThat(firstCall.getReferenceNumber(), equalTo("0124"));
+        assertThat(firstCall.getPartyAtype(), equalTo(SophoPartyType.PSTN));
+        assertThat(firstCall.getPartyAFarEnd(), equalTo("3134755794"));
+        assertThat(firstCall.getPartyALine(), equalTo("0001"));
+        assertThat(firstCall.getPartyARoute(), equalTo("000"));
+        assertThat(firstCall.getPartyBtype(), equalTo(SophoPartyType.EXTENSION));
+        assertThat(firstCall.getPartyBFarEnd(), equalTo("6108"));
+        assertThat(firstCall.getPartyBRoute(), equalTo(null));
+        assertThat(firstCall.getPartyBLine(), equalTo(null));
+        assertThat(firstCall.getIbsc(), equalTo(DEFAULT_ISBC));
+        assertThat(firstCall.isAnsweredStatus(),equalTo(true));
+        assertThat(firstCall.isNonPreferedRoute(), equalTo(false));
+        assertThat(firstCall.getMeteringPulses(), equalTo(0));
+    }
+
+
+    @Test
+    public void ExternalToExternal() throws Exception{
+        List<SophoCall> sophoCalls = pollerService.getBilling(
+                connection,DEFAULT_CDR_TABLE,INITIAL_ID,remoteServers.get(0).getNumberMap());
+        SophoCall firstCall = sophoCalls.get(8);
+        assertThat(firstCall.getDate(), equalTo(new Date(115, Calendar.APRIL, 29,8, 36)));
+        assertThat(firstCall.getReferenceNumber(), equalTo("0116"));
+        assertThat(firstCall.getPartyAtype(), equalTo(SophoPartyType.PSTN));
+        assertThat(firstCall.getPartyAFarEnd(), equalTo("3134755794"));
+        assertThat(firstCall.getPartyALine(), equalTo("0001"));
+        assertThat(firstCall.getPartyARoute(), equalTo("000"));
+        assertThat(firstCall.getPartyBtype(), equalTo(SophoPartyType.PSTN));
+        assertThat(firstCall.getPartyBFarEnd(), equalTo(""));
+        assertThat(firstCall.getDestination(), equalTo("35229540"));
+        assertThat(firstCall.getPartyBRoute(), equalTo("000"));
+        assertThat(firstCall.getPartyBLine(), equalTo("0001"));
+        assertThat(firstCall.getIbsc(), equalTo(DEFAULT_ISBC));
+        assertThat(firstCall.isAnsweredStatus(),equalTo(false));
+        assertThat(firstCall.isNonPreferedRoute(), equalTo(false));
+        assertThat(firstCall.getMeteringPulses(), equalTo(0));
+    }
+
+    @Test
     public void InternalAndDDDReplacementTest() throws Exception{
         List<SophoCall> sophoCalls = pollerService.getBilling(
                 connection,DEFAULT_CDR_TABLE,INITIAL_ID,remoteServers.get(1).getNumberMap());
@@ -287,5 +348,16 @@ public class PollerServiceTest {
         assertThat(sophoCalls.get(9).getCostCentreType(), equalTo(SophoCostCentreType.NO_COST_CENTRE));
     }
 
+    @Test
+    public void privateBusinessTest() throws Exception{
+        List<SophoCall> sophoCalls = pollerService.getBilling(
+                connection,DEFAULT_CDR_TABLE,INITIAL_ID,remoteServers.get(0).getNumberMap());
+        assertThat(sophoCalls.get(0).getPasswordIndication(), equalTo(SophoPasswordIndication.NORMAL_CALL));
+        assertThat(sophoCalls.get(0).isPrivateCall(), equalTo(false));
+        assertThat(sophoCalls.get(1).isPrivateCall(), equalTo(true));
+        assertThat(sophoCalls.get(7).isPrivateCall(), equalTo(true));
+        assertThat(sophoCalls.get(8).isPrivateCall(), equalTo(false));
+
+    }
 
 }
