@@ -5,11 +5,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.ImportResource;
 import java.util.List;
 
 @SpringBootApplication
 @ImportResource("file:config.xml")
+@ComponentScan(basePackages = "com.tenacity.billing")
 public class BillingConverterApplication {
 
     private static Logger logger = LoggerFactory.getLogger(BillingConverterApplication.class);
@@ -24,6 +26,8 @@ public class BillingConverterApplication {
         for (RemoteServer remoteServer : remoteServers) {
             logger.info(remoteServer.getName()+"("+remoteServer.getAddress()+")");
         }
+        PollerService pollerService = ctx.getBean(PollerService.class);
+        pollerService.run();
         logger.info("Stopping Billing Converter...");
     }
 

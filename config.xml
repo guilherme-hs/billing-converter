@@ -8,7 +8,7 @@
     <!--Servers to collect-->
 
     <bean class="com.tenacity.billing.RemoteServer" id="tenacity">
-        <property name="name" value="tenacity - Pysix"></property>
+        <property name="name" value="tenacity-Pysix"></property>
         <property name="address" value="192.168.0.2"></property>
         <property name="username" value="root"></property>
         <property name="password" value="advah310755"></property>
@@ -19,7 +19,7 @@
     </bean>
 
     <bean class="com.tenacity.billing.RemoteServer" id="tenacity-gsm">
-        <property name="name" value="tenacity - GSM Gateway"></property>
+        <property name="name" value="tenacity-GSM-Gateway"></property>
         <property name="address" value="192.168.0.188"></property>
         <property name="username" value="root"></property>
         <property name="password" value="advah310755"></property>

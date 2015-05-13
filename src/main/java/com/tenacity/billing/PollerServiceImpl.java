@@ -6,24 +6,27 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.io.*;
+import java.sql.*;
 import java.text.DecimalFormat;
 import java.util.*;
+import java.util.Date;
 
 /**
  * Keep running and pooling the remote servers for calls
  */
 @Service
-public class PollerServiceImpl {
+public class PollerServiceImpl implements PollerService{
 
     public static final String CALLDATE_COLLUMN = "calldate";
     public static final int INITIAL_REFERENCE_NUMBER = 100;
     public static final int MAX_REFERENCE_NUMBER = 199;
     public static final int NO_SECONDS = 0;
     public static final int DEFAULT_IBSC = 14;
+    public static final int NO_REGISTERS = 0;
+    public static final String DEFAULT_SYNC_FILE = "sync-status.properties";
+    public static final String VERSION_PROPERTY = "version";
+    public static final String PROP_VERSION = "1.0";
     private boolean stop = true;
 
     protected int max_registries=1000;
@@ -32,7 +35,9 @@ public class PollerServiceImpl {
 
     protected StringBuilder sb = new StringBuilder();
 
-    DecimalFormat referenceNumberFormatter = new DecimalFormat("0000");
+    protected DecimalFormat referenceNumberFormatter = new DecimalFormat("0000");
+
+    protected int referenceNumber = INITIAL_REFERENCE_NUMBER;
 
     @Autowired
     protected List<RemoteServer> remoteServerList;
@@ -46,6 +51,11 @@ public class PollerServiceImpl {
         } finally {
 
         }
+
+        for (RemoteServer remoteServer : remoteServerList) {
+            pollServer(remoteServer);
+        }
+
     }
 
     /**
@@ -65,8 +75,8 @@ public class PollerServiceImpl {
 
     /**
      * Gets teh calls from the provided connection
-     * @param connection
-     * @param table
+     * @param connection - connection provided
+     * @param table - table with the cdr records
      * @param initialId
      * @param numberMap
      * @return
@@ -75,13 +85,15 @@ public class PollerServiceImpl {
             Connection connection,String table, int initialId, List<Map<String,String>> numberMap){
         logger.info("Connecting on database and fetching records...");
         List<SophoCall> returnValue = new ArrayList<>();
-        int referenceNumber = INITIAL_REFERENCE_NUMBER;
         try {
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery("SELECT * FROM " +
                     table + " where Id > " + initialId + " limit "+max_registries);
             while(resultSet.next()){
                 SophoCall sophoCall = new SophoCall();
+
+                int id = resultSet.getInt("Id");
+                sophoCall.setId(""+id);
                 //gets the date
                 Date date = resultSet.getTimestamp(CALLDATE_COLLUMN);
                 date.setSeconds(NO_SECONDS);
@@ -151,9 +163,7 @@ public class PollerServiceImpl {
                                     sophoCall.setPartyBLine(rules.get("line"));
                                 }
                                 userfield = resultSet.getString("userfield");
-                                logger.info("Userfield:"+userfield);
                                 if(userfield.equalsIgnoreCase("\"P\"")){
-                                    logger.info("Setting pivate call...");
                                     sophoCall.setPrivateCall(true);
                                 }
 
@@ -195,5 +205,115 @@ public class PollerServiceImpl {
         }
         return null;
     }
+
+    protected List<SophoCall> pollServer(RemoteServer remoteServer){
+        int actualId=0;
+        Connection connection = null;
+        Statement statement = null;
+        List<SophoCall> sophoCalls = new ArrayList<>();
+
+        //tries to load the actual state
+        Properties prop = new Properties();
+        InputStream input = null;
+        File syncStatusFile = new File(DEFAULT_SYNC_FILE);
+        OutputStream output = null;
+
+        try{
+            if(syncStatusFile.isFile() && syncStatusFile.canRead())
+            input = new FileInputStream(DEFAULT_SYNC_FILE);
+            if(input != null){
+                prop.load(input);
+            }else{
+                logger.warn("sync-status file not found... creating one");
+                output = new FileOutputStream(DEFAULT_SYNC_FILE);
+                prop.setProperty(VERSION_PROPERTY, PROP_VERSION);
+                prop.store(output,null);
+            }
+        }catch (IOException ex){
+            logger.error("Error reading actual state..",ex);
+        }finally {
+            if(input != null ){
+                try {
+                    input.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            if(output!=null){
+                try {
+                    output.flush();
+                    output.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        try {
+            syncStatusFile.delete();
+            output = new FileOutputStream(DEFAULT_SYNC_FILE);
+        } catch (FileNotFoundException e) {
+            logger.error("error opening sync-status file...",e);
+            return null;
+        }
+
+        String savedId = prop.getProperty(remoteServer.getName());
+        if(savedId != null){
+            actualId = Integer.parseInt(savedId);
+        }
+
+        if(stop){
+            logger.warn("Asked to stop the polling... Stopping now!!!");
+        }
+        logger.info("Polling Server:" + remoteServer.getName() + "(" + remoteServer.getAddress() + ")");
+        try {
+            connection= DriverManager
+                    .getConnection("jdbc:mysql://" + remoteServer.getAddress() +":"+remoteServer.getPort()
+                            +"/"+remoteServer.getDatabase()+"?user=" + remoteServer.getUsername()
+                            + "&password=" + remoteServer.getPassword());
+            statement = connection.createStatement();
+            List<SophoCall> actualCalls = new ArrayList<>();
+            do{
+                actualCalls = getBilling(connection,remoteServer.getTable(),actualId,remoteServer.getNumberMap());
+                if(actualCalls.size() != NO_REGISTERS) {
+                    actualId = Integer.parseInt(actualCalls.get(actualCalls.size() - 1).getId());
+                }
+                sophoCalls.addAll(actualCalls);
+                prop.setProperty(remoteServer.getName(),""+actualId);
+                prop.store(output, null);
+            }while(actualCalls.size() > 0);
+        } catch (SQLException e) {
+            logger.
+                    error("Error Polling Server " + remoteServer.getName() + "(" + remoteServer.getAddress() + ")", e);
+        }catch (IOException e){
+            logger.error("Error saving sync-status file...");
+        }
+        finally {
+            if(statement != null){
+                try {
+                    statement.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (connection!=null) {
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+            if(output!=null){
+                try {
+                    output.flush();
+                    output.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return sophoCalls;
+    }
+
 
 }

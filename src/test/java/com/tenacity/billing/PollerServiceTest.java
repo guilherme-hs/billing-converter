@@ -11,12 +11,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.io.*;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.Statement;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Properties;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -31,6 +33,9 @@ public class PollerServiceTest {
     public static final String INITIAL_REFERENCE_NUMBER = "0100";
     public static final String SECOND_REFERENCE_NUMBER = "0102";
     public static final int DEFAULT_ISBC = 14;
+    public static final int TOTAL_CALLS = 60;
+    public static final String DEFAULT_SERVER_NAME = "test-server";
+    public static final int NO_REGISTERS = 0;
     @Autowired
     protected PollerServiceImpl pollerService;
 
@@ -58,6 +63,13 @@ public class PollerServiceTest {
 
     @Before
     public void setUp() throws Exception{
+        pollerService.max_registries= 1000;
+        pollerService.referenceNumber= 100;
+
+        //deletes the sync status file
+        File file = new File(PollerServiceImpl.DEFAULT_SYNC_FILE);
+        file.delete();
+
         connection = DriverManager
                 .getConnection("jdbc:mysql://localhost/asteriskcdrdbTest?user=root&password=advah310755");
         statement = connection.createStatement();
@@ -170,7 +182,7 @@ public class PollerServiceTest {
     public void getBillingTest() throws Exception{
         List<SophoCall> sophoCalls = pollerService.getBilling(
                 connection,DEFAULT_CDR_TABLE,INITIAL_ID,remoteServers.get(0).getNumberMap());
-        assertThat(sophoCalls.size(), equalTo(60));
+        assertThat(sophoCalls.size(), equalTo(TOTAL_CALLS));
     }
 
     @Test
@@ -181,6 +193,7 @@ public class PollerServiceTest {
         assertThat(firstCall.getDate(), equalTo(new Date(114, Calendar.APRIL, 27, 16, 48)));
         assertThat(firstCall.getReferenceNumber(), equalTo(INITIAL_REFERENCE_NUMBER));
         assertThat(sophoCalls.get(1).getReferenceNumber(), equalTo(SECOND_REFERENCE_NUMBER));
+        assertThat(firstCall.getId(), equalTo("1575"));
         assertThat(firstCall.getPartyAtype(), equalTo(SophoPartyType.EXTENSION));
         assertThat(firstCall.getPartyAFarEnd(), equalTo("6108"));
         assertThat(firstCall.getPartyALine(), equalTo(null));
@@ -358,6 +371,125 @@ public class PollerServiceTest {
         assertThat(sophoCalls.get(7).isPrivateCall(), equalTo(true));
         assertThat(sophoCalls.get(8).isPrivateCall(), equalTo(false));
 
+    }
+
+    @Test
+    public void initialIdTest() throws Exception{
+        List<SophoCall> sophoCalls = pollerService.getBilling(
+                connection,DEFAULT_CDR_TABLE,1676,remoteServers.get(0).getNumberMap());
+        SophoCall firstCall = sophoCalls.get(0);
+        assertThat(firstCall.getDate(), equalTo(new Date(115, Calendar.APRIL, 29,8, 35)));
+        assertThat(firstCall.getReferenceNumber(), equalTo("0100"));
+        assertThat(firstCall.getPartyAtype(), equalTo(SophoPartyType.EXTENSION));
+        assertThat(firstCall.getPartyAFarEnd(), equalTo("6111"));
+        assertThat(firstCall.getPartyALine(), equalTo(null));
+        assertThat(firstCall.getPartyARoute(), equalTo(null));
+        assertThat(firstCall.getPartyBtype(), equalTo(SophoPartyType.PSTN));
+        assertThat(firstCall.getPartyBFarEnd(), equalTo(""));
+        assertThat(firstCall.getDestination(), equalTo("30259500"));
+        assertThat(firstCall.getPartyBRoute(), equalTo("000"));
+        assertThat(firstCall.getPartyBLine(), equalTo("0001"));
+        assertThat(firstCall.getIbsc(), equalTo(DEFAULT_ISBC));
+        assertThat(firstCall.isAnsweredStatus(),equalTo(true));
+        assertThat(firstCall.isNonPreferedRoute(), equalTo(false));
+        assertThat(firstCall.getMeteringPulses(), equalTo(0));
+    }
+
+    @Test
+    public void pollServerTest() throws Exception{
+        remoteServers.get(0).setAddress("127.0.0.1");
+        remoteServers.get(0).setDatabase("asteriskcdrdbTest");
+        List<SophoCall> sophoCalls = pollerService.pollServer(remoteServers.get(0));
+        assertThat(sophoCalls.size(), equalTo(TOTAL_CALLS));
+    }
+
+    @Test
+    public void syncFileCreationTest() throws Exception{
+        remoteServers.get(0).setName(DEFAULT_SERVER_NAME);
+        remoteServers.get(0).setAddress("127.0.0.1");
+        remoteServers.get(0).setDatabase("asteriskcdrdbTest");
+        List<SophoCall> sophoCalls = pollerService.pollServer(remoteServers.get(0));
+        File syncStatusFile = new File(PollerServiceImpl.DEFAULT_SYNC_FILE);
+        assertThat(syncStatusFile.isFile(), equalTo(true));
+        assertThat(syncStatusFile.canRead(), equalTo(true));
+        Properties prop = new Properties();
+        InputStream input = new FileInputStream(PollerServiceImpl.DEFAULT_SYNC_FILE);
+        prop.load(input);
+        assertThat(prop.getProperty(PollerServiceImpl.VERSION_PROPERTY), equalTo(PollerServiceImpl.PROP_VERSION));
+        assertThat(prop.getProperty(DEFAULT_SERVER_NAME), equalTo("1782"));
+    }
+
+    @Test
+    public void initialValueTest() throws Exception{
+        remoteServers.get(0).setName(DEFAULT_SERVER_NAME);
+        remoteServers.get(0).setAddress("127.0.0.1");
+        remoteServers.get(0).setDatabase("asteriskcdrdbTest");
+        Properties prop = new Properties();
+        OutputStream output = null;
+
+        try {
+            output = new FileOutputStream(PollerServiceImpl.DEFAULT_SYNC_FILE);
+            prop.setProperty(DEFAULT_SERVER_NAME,"1679");
+            prop.store(output,null);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if(output != null){
+                try {
+                    output.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        List<SophoCall> sophoCalls = pollerService.pollServer(remoteServers.get(0));
+        assertThat(sophoCalls.size(), equalTo(TOTAL_CALLS-10));
+    }
+
+    @Test
+    public void syncFileUsageTest() throws Exception{
+        remoteServers.get(0).setName(DEFAULT_SERVER_NAME);
+        remoteServers.get(0).setAddress("127.0.0.1");
+        remoteServers.get(0).setDatabase("asteriskcdrdbTest");
+        List<SophoCall> sophoCalls = pollerService.pollServer(remoteServers.get(0));
+        File syncStatusFile = new File(PollerServiceImpl.DEFAULT_SYNC_FILE);
+        assertThat(syncStatusFile.isFile(), equalTo(true));
+        assertThat(syncStatusFile.canRead(), equalTo(true));
+        Properties prop = new Properties();
+        InputStream input = new FileInputStream(PollerServiceImpl.DEFAULT_SYNC_FILE);
+        prop.load(input);
+        assertThat(prop.getProperty(PollerServiceImpl.VERSION_PROPERTY), equalTo(PollerServiceImpl.PROP_VERSION));
+        assertThat(prop.getProperty(DEFAULT_SERVER_NAME), equalTo("1782"));
+        input.close();
+        assertThat(sophoCalls.size(), equalTo(TOTAL_CALLS));
+        sophoCalls = pollerService.pollServer(remoteServers.get(0));
+        prop = new Properties();
+        input = new FileInputStream(PollerServiceImpl.DEFAULT_SYNC_FILE);
+        prop.load(input);
+        assertThat(prop.getProperty(PollerServiceImpl.VERSION_PROPERTY), equalTo(PollerServiceImpl.PROP_VERSION));
+        assertThat(prop.getProperty(DEFAULT_SERVER_NAME), equalTo("1782"));
+        input.close();
+        assertThat(sophoCalls.size(), equalTo(NO_REGISTERS));
+    }
+
+    @Test
+    public void maxRegistersTest() throws Exception{
+        List<SophoCall> sophoCalls = null;
+        pollerService.max_registries = 10;
+        int actualId = 0;
+        int i;
+        for(i = 0; i < 6; i++){
+            sophoCalls = pollerService.getBilling(
+                    connection,DEFAULT_CDR_TABLE,actualId,remoteServers.get(0).getNumberMap());
+            assertThat(sophoCalls.size(), equalTo(pollerService.max_registries));
+            logger.info("i:"+i);
+            actualId = Integer.parseInt(sophoCalls.get(sophoCalls.size()-1).getId());
+        }
+        sophoCalls = pollerService.getBilling(
+                connection,DEFAULT_CDR_TABLE,actualId,remoteServers.get(0).getNumberMap());
+        assertThat(i, equalTo(6));
     }
 
 }
