@@ -1,15 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="fa4644f0-8e81-4e47-85c4-27ac4034dd44" name="Default" comment="Added sync-status feature&#10;&#10;- added sync-status to save the actual state&#10;- added tests for the sync-status file&#10;">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/sync-status.properties" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/tenacity-gsm-calls.txt" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/testCallFile.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/com/tenacity/billing/PollerServiceImpl.java" afterPath="$PROJECT_DIR$/src/main/java/com/tenacity/billing/PollerServiceImpl.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/com/tenacity/billing/PollerServiceTest.java" afterPath="$PROJECT_DIR$/src/test/java/com/tenacity/billing/PollerServiceTest.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/com/tenacity/billing/RemoteServer.java" afterPath="$PROJECT_DIR$/src/main/java/com/tenacity/billing/RemoteServer.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/billing-converter.iml" afterPath="$PROJECT_DIR$/billing-converter.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/config.xml" afterPath="$PROJECT_DIR$/config.xml" />
+    <list default="true" id="fa4644f0-8e81-4e47-85c4-27ac4034dd44" name="Default" comment="">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/README.md" afterPath="$PROJECT_DIR$/README.md" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="billing-converter.iws" />
@@ -62,8 +55,8 @@
           <file leaf-file-name="PollerServiceTest.java" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/src/test/java/com/tenacity/billing/PollerServiceTest.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state vertical-scroll-proportion="0.17887029">
-                  <caret line="179" column="16" selection-start-line="179" selection-start-column="16" selection-end-line="179" selection-end-column="16" />
+                <state vertical-scroll-proportion="0.32008368">
+                  <caret line="188" column="50" selection-start-line="188" selection-start-column="50" selection-end-line="188" selection-end-column="50" />
                   <folding>
                     <element signature="imports" expanded="true" />
                     <marker date="1431693269000" expanded="true" signature="2931:2956" placeholder="DROP TABLE I..." />
@@ -169,6 +162,7 @@
         <option value="$PROJECT_DIR$/src/main/java/com/tenacity/billing/RemoteServer.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/tenacity/billing/PollerServiceImpl.java" />
         <option value="$PROJECT_DIR$/src/test/java/com/tenacity/billing/PollerServiceTest.java" />
+        <option value="$PROJECT_DIR$/README.md" />
       </list>
     </option>
   </component>
@@ -398,7 +392,7 @@
     <ConfirmationsSetting value="0" id="Remove" />
   </component>
   <component name="ProjectView">
-    <navigator proportions="" version="1">
+    <navigator currentView="ProjectPane" proportions="" version="1">
       <flattenPackages />
       <showMembers />
       <showModules />
@@ -409,7 +403,31 @@
       <autoscrollFromSource />
       <sortByType />
     </navigator>
-    <panes />
+    <panes>
+      <pane id="Scope" />
+      <pane id="ProjectPane">
+        <subPane>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="billing-converter" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="billing-converter" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="billing-converter" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+        </subPane>
+      </pane>
+      <pane id="Scratches" />
+      <pane id="PackagesPane" />
+    </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="aspect.path.notification.shown" value="true" />
@@ -831,7 +849,7 @@
       <workItem from="1431344819705" duration="33355000" />
       <workItem from="1431603743884" duration="67000" />
       <workItem from="1431604044106" duration="3932000" />
-      <workItem from="1431951828616" duration="239000" />
+      <workItem from="1431951828616" duration="399000" />
     </task>
     <task id="LOCAL-00001" summary="added Intellij integration">
       <created>1429896029895</created>
@@ -887,11 +905,17 @@
       <option name="project" value="LOCAL" />
       <updated>1431518652485</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="Finished Unit Tests&#10;&#10;- Finished all unit tests&#10;">
+      <created>1431952106207</created>
+      <option name="number" value="00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1431952106207</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="141428000" />
+    <option name="totallyTimeSpent" value="141588000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="23" width="1920" height="1053" extended-state="0" />
@@ -914,7 +938,7 @@
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.13242961" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.13229166" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.44918698" sideWeight="0.49791667" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -946,7 +970,8 @@
     <MESSAGE value="Added new Tests and private call handling&#10;- Added private call indication&#10;- Added tests for external to external" />
     <MESSAGE value="Refactored Poller Service into an interface" />
     <MESSAGE value="Added sync-status feature&#10;&#10;- added sync-status to save the actual state&#10;- added tests for the sync-status file&#10;" />
-    <option name="LAST_COMMIT_MESSAGE" value="Added sync-status feature&#10;&#10;- added sync-status to save the actual state&#10;- added tests for the sync-status file&#10;" />
+    <MESSAGE value="Finished Unit Tests&#10;&#10;- Finished all unit tests&#10;" />
+    <option name="LAST_COMMIT_MESSAGE" value="Finished Unit Tests&#10;&#10;- Finished all unit tests&#10;" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -959,22 +984,6 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/tenacity/billing/PollerServiceImpl.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <marker date="1431526757000" expanded="true" signature="2685:2698" placeholder="SELECT * FRO..." />
-            <marker date="1431526757000" expanded="true" signature="2685:2699" placeholder="SELECT * FRO..missingValue..." />
-            <marker date="1431526757000" expanded="true" signature="2685:2743" placeholder="SELECT * FRO..missingValue..." />
-            <marker date="1431526757000" expanded="true" signature="2685:2744" placeholder="SELECT * FRO..missingValue..." />
-            <marker date="1431526757000" expanded="true" signature="2685:2767" placeholder="SELECT * FRO..missingValue..." />
-            <marker date="1431526757000" expanded="true" signature="2685:2768" placeholder="SELECT * FRO..missingValue..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/test/java/com/tenacity/billing/BillingConverterApplicationTests.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -1435,10 +1444,21 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/README.md">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.048543688">
+          <caret line="3" column="0" selection-start-line="3" selection-start-column="0" selection-end-line="3" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+      <provider editor-type-id="MarkdownPreviewEditor">
+        <state />
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/test/java/com/tenacity/billing/PollerServiceTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.17887029">
-          <caret line="179" column="16" selection-start-line="179" selection-start-column="16" selection-end-line="179" selection-end-column="16" />
+        <state vertical-scroll-proportion="0.32008368">
+          <caret line="188" column="50" selection-start-line="188" selection-start-column="50" selection-end-line="188" selection-end-column="50" />
           <folding>
             <element signature="imports" expanded="true" />
             <marker date="1431693269000" expanded="true" signature="2931:2956" placeholder="DROP TABLE I..." />
