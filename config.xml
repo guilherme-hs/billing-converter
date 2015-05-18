@@ -16,6 +16,8 @@
         <property name="port" value="3306"></property>
         <property name="table" value="cdr"></property>
         <property name="numberMap" ref="defaultNumberMap"></property>
+        <property name="callFile" value="tenacity-calls.txt"></property>
+        <property name="lessSpaces" value="true"></property>
     </bean>
 
     <bean class="com.tenacity.billing.RemoteServer" id="tenacity-gsm">
@@ -27,6 +29,7 @@
         <property name="port" value="3306"></property>
         <property name="table" value="cdr"></property>
         <property name="numberMap" ref="replaceNumberMap"></property>
+        <property name="callFile" value="tenacity-gsm-calls.txt"></property>
     </bean>
 
 

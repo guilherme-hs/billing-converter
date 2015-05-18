@@ -37,6 +37,11 @@ public class RemoteServer {
     //default map if no map found
     private Map<String,String> defaultMap;
 
+    //file to save the calls
+    private String callFile = "ligacao.txt";
+
+    private boolean lessSpaces = false;
+
     public String getName() {
         return name;
     }
@@ -107,6 +112,22 @@ public class RemoteServer {
 
     public void setDefaultMap(Map<String, String> defaultMap) {
         this.defaultMap = defaultMap;
+    }
+
+    public String getCallFile() {
+        return callFile;
+    }
+
+    public void setCallFile(String callFile) {
+        this.callFile = callFile;
+    }
+
+    public boolean isLessSpaces() {
+        return lessSpaces;
+    }
+
+    public void setLessSpaces(boolean lessSpaces) {
+        this.lessSpaces = lessSpaces;
     }
 
     @Override

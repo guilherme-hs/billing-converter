@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Properties;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 
@@ -36,6 +37,7 @@ public class PollerServiceTest {
     public static final int TOTAL_CALLS = 60;
     public static final String DEFAULT_SERVER_NAME = "test-server";
     public static final int NO_REGISTERS = 0;
+    public static final String SOME_HEADER = "Some Header";
     @Autowired
     protected PollerServiceImpl pollerService;
 
@@ -67,8 +69,13 @@ public class PollerServiceTest {
         pollerService.referenceNumber= 100;
 
         //deletes the sync status file
-        File file = new File(PollerServiceImpl.DEFAULT_SYNC_FILE);
-        file.delete();
+        File syncFile = new File(PollerServiceImpl.DEFAULT_SYNC_FILE);
+        syncFile.delete();
+
+
+        //deletes the call file
+        File callFile = new File(remoteServers.get(0).getCallFile());
+        callFile.delete();
 
         connection = DriverManager
                 .getConnection("jdbc:mysql://localhost/asteriskcdrdbTest?user=root&password=advah310755");
@@ -492,4 +499,70 @@ public class PollerServiceTest {
         assertThat(i, equalTo(6));
     }
 
+    @Test
+    public void callFileCreationTest() throws Exception{
+        File testCallFile = new File("testCallFile.txt");
+        testCallFile.delete();
+        remoteServers.get(0).setName(DEFAULT_SERVER_NAME);
+        remoteServers.get(0).setAddress("127.0.0.1");
+        remoteServers.get(0).setDatabase("asteriskcdrdbTest");
+        remoteServers.get(0).setCallFile("testCallFile.txt");
+        List<SophoCall> sophoCalls = pollerService.pollServer(remoteServers.get(0));
+        assertThat(testCallFile.isFile(), equalTo(true));
+        assertThat(testCallFile.canRead(), equalTo(true));
+    }
+
+    @Test
+    public void callFileAppendTest() throws Exception{
+        File testCallFile = new File("testCallFile.txt");
+        testCallFile.delete();
+        testCallFile.createNewFile();
+        FileWriter fileWritter = new FileWriter(testCallFile.getName(),true);
+        BufferedWriter bufferWritter = new BufferedWriter(fileWritter);
+        bufferWritter.write(SOME_HEADER);
+        bufferWritter.close();
+        fileWritter.close();
+        remoteServers.get(0).setName(DEFAULT_SERVER_NAME);
+        remoteServers.get(0).setAddress("127.0.0.1");
+        remoteServers.get(0).setDatabase("asteriskcdrdbTest");
+        remoteServers.get(0).setCallFile("testCallFile.txt");
+        List<SophoCall> sophoCalls = pollerService.pollServer(remoteServers.get(0));
+        assertThat(testCallFile.isFile(), equalTo(true));
+        assertThat(testCallFile.canRead(), equalTo(true));
+        BufferedReader br = new BufferedReader(new FileReader(testCallFile.getName()));
+        assertThat(br.readLine(), equalTo(SOME_HEADER));
+        assertThat(br.readLine(), notNullValue());
+    }
+
+    @Test
+    public void callFileContentTestWithLessSpaces() throws Exception{
+        File testCallFile = new File("testCallFile.txt");
+        testCallFile.delete();
+        testCallFile.createNewFile();
+        FileWriter fileWritter = new FileWriter(testCallFile.getName(),true);
+        BufferedWriter bufferWritter = new BufferedWriter(fileWritter);
+        bufferWritter.write(SOME_HEADER);
+        bufferWritter.close();
+        fileWritter.close();
+        remoteServers.get(0).setName(DEFAULT_SERVER_NAME);
+        remoteServers.get(0).setAddress("127.0.0.1");
+        remoteServers.get(0).setDatabase("asteriskcdrdbTest");
+        remoteServers.get(0).setCallFile("testCallFile.txt");
+        List<SophoCall> sophoCalls = pollerService.pollServer(remoteServers.get(0));
+        assertThat(testCallFile.isFile(), equalTo(true));
+        assertThat(testCallFile.canRead(), equalTo(true));
+        BufferedReader br = new BufferedReader(new FileReader(testCallFile.getName()));
+        assertThat(br.readLine(), equalTo(SOME_HEADER));
+        assertThat(br.readLine(), equalTo(sophoCalls.get(0).getFDCRStandardStringWithLessSpaces()));
+        assertThat(br.readLine(), equalTo(sophoCalls.get(0).getFDCRAccountingStringWithLessSpaces()));
+        assertThat(br.readLine(), equalTo(sophoCalls.get(1).getFDCRStandardStringWithLessSpaces()));
+        assertThat(br.readLine(), equalTo(sophoCalls.get(1).getFDCRAccountingStringWithLessSpaces()));
+        assertThat(br.readLine(), equalTo(sophoCalls.get(2).getFDCRStandardStringWithLessSpaces()));
+        assertThat(br.readLine(), equalTo(sophoCalls.get(3).getFDCRStandardStringWithLessSpaces()));
+        for (int i = 0; i < 5; i++) {
+            br.readLine();
+        }
+        assertThat(br.readLine(), equalTo(sophoCalls.get(8).getFDCRStandardStringWithLessSpaces()));
+
+    }
 }
