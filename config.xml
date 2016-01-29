@@ -20,18 +20,6 @@
         <property name="lessSpaces" value="true"></property>
     </bean>
 
-    <bean class="com.tenacity.billing.RemoteServer" id="tenacity-gsm">
-        <property name="name" value="tenacity-GSM-Gateway"></property>
-        <property name="address" value="192.168.0.188"></property>
-        <property name="username" value="root"></property>
-        <property name="password" value="advah310755"></property>
-        <property name="database" value="asteriskcdrdb"></property>
-        <property name="port" value="3306"></property>
-        <property name="table" value="cdr"></property>
-        <property name="numberMap" ref="replaceNumberMap"></property>
-        <property name="callFile" value="tenacity-gsm-calls.txt"></property>
-    </bean>
-
 
     <!--bean that will contain the servers-->
     <util:list id="remoteServers" value-type="com.tenacity.billing.RemoteServer">

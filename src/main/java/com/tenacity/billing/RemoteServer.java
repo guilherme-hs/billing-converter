@@ -40,7 +40,11 @@ public class RemoteServer {
     //file to save the calls
     private String callFile = "ligacao.txt";
 
+    //indicates if the server uses less spaces in the conversion file
     private boolean lessSpaces = false;
+
+
+
 
     public String getName() {
         return name;
