@@ -3,15 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="fa4644f0-8e81-4e47-85c4-27ac4034dd44" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/billing-converter.iml" afterPath="$PROJECT_DIR$/billing-converter.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/config.xml" afterPath="$PROJECT_DIR$/config.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/pom.xml" afterPath="$PROJECT_DIR$/pom.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/com/tenacity/billing/PollerServiceImpl.java" afterPath="$PROJECT_DIR$/src/main/java/com/tenacity/billing/PollerServiceImpl.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/com/tenacity/billing/RemoteServer.java" afterPath="$PROJECT_DIR$/src/main/java/com/tenacity/billing/RemoteServer.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/com/tenacity/billing/PollerServiceTest.java" afterPath="$PROJECT_DIR$/src/test/java/com/tenacity/billing/PollerServiceTest.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sync-status.properties" afterPath="$PROJECT_DIR$/sync-status.properties" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/tenacity-gsm-calls.txt" afterPath="$PROJECT_DIR$/tenacity-gsm-calls.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/testCallFile.txt" afterPath="$PROJECT_DIR$/testCallFile.txt" />
     </list>
     <ignored path="billing-converter.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -57,8 +48,8 @@
           <file leaf-file-name="pom.xml" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/pom.xml">
               <provider selected="true" editor-type-id="text-editor">
-                <state vertical-scroll-proportion="0.66201717">
-                  <caret line="75" column="48" selection-start-line="75" selection-start-column="48" selection-end-line="75" selection-end-column="48" />
+                <state vertical-scroll-proportion="0.7746781">
+                  <caret line="82" column="20" selection-start-line="82" selection-start-column="20" selection-end-line="82" selection-end-column="20" />
                   <folding />
                 </state>
               </provider>
@@ -106,7 +97,7 @@
           <file leaf-file-name="PollerServiceImpl.java" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/src/main/java/com/tenacity/billing/PollerServiceImpl.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state vertical-scroll-proportion="0.9686192">
+                <state vertical-scroll-proportion="5.801255">
                   <caret line="428" column="60" selection-start-line="428" selection-start-column="60" selection-end-line="428" selection-end-column="60" />
                   <folding>
                     <element signature="imports" expanded="true" />
@@ -1141,7 +1132,7 @@
       <workItem from="1454070639644" duration="167000" />
       <workItem from="1454070865065" duration="18530000" />
       <workItem from="1454098467762" duration="42000" />
-      <workItem from="1454682052614" duration="61000" />
+      <workItem from="1454682052614" duration="143000" />
     </task>
     <task id="LOCAL-00001" summary="added Intellij integration">
       <created>1429896029895</created>
@@ -1215,7 +1206,19 @@
       <option name="project" value="LOCAL" />
       <updated>1454072061911</updated>
     </task>
-    <option name="localTasksCounter" value="13" />
+    <task id="LOCAL-00013" summary="refactor(version): changed version to 1.0.4">
+      <created>1454682150132</created>
+      <option name="number" value="00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1454682150132</updated>
+    </task>
+    <task id="LOCAL-00014" summary="refactor(version): changed version to 1.0.1">
+      <created>1454682180081</created>
+      <option name="number" value="00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1454682180081</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
     <servers />
   </component>
   <component name="TestHistory">
@@ -1251,7 +1254,7 @@
     </history-entry>
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="160516000" />
+    <option name="totallyTimeSpent" value="160598000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="23" width="1920" height="1053" extended-state="6" />
@@ -1259,6 +1262,7 @@
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3211382" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Palette&#9;" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.29716024" sideWeight="0.50208336" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -1278,7 +1282,6 @@
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3211382" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.45325205" sideWeight="0.49791667" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Coverage" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3296875" sideWeight="0.5" order="4" side_tool="true" content_ui="tabs" />
@@ -1309,7 +1312,9 @@
     <MESSAGE value="Finished Unit Tests&#10;&#10;- Finished all unit tests&#10;" />
     <MESSAGE value="Added README.md&#10;" />
     <MESSAGE value="refactor(database): altered database id type to longInt&#10;refactor(version): changed version to 1.0.1" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactor(database): altered database id type to longInt&#10;refactor(version): changed version to 1.0.1" />
+    <MESSAGE value="refactor(version): changed version to 1.0.4" />
+    <MESSAGE value="refactor(version): changed version to 1.0.1" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactor(version): changed version to 1.0.1" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1780,7 +1785,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/tenacity/billing/PollerServiceImpl.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.9686192">
+        <state vertical-scroll-proportion="5.801255">
           <caret line="428" column="60" selection-start-line="428" selection-start-column="60" selection-end-line="428" selection-end-column="60" />
           <folding>
             <element signature="imports" expanded="true" />
@@ -1828,8 +1833,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/pom.xml">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.66201717">
-          <caret line="75" column="48" selection-start-line="75" selection-start-column="48" selection-end-line="75" selection-end-column="48" />
+        <state vertical-scroll-proportion="0.7746781">
+          <caret line="82" column="20" selection-start-line="82" selection-start-column="20" selection-end-line="82" selection-end-column="20" />
           <folding />
         </state>
       </provider>
