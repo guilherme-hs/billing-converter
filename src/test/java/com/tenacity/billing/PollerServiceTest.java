@@ -76,6 +76,8 @@ public class PollerServiceTest {
         //deletes the call file
         File callFile = new File(remoteServers.get(0).getCallFile());
         callFile.delete();
+        remoteServers.get(1).setFileType("sopho");
+
 
         connection = DriverManager
                 .getConnection("jdbc:mysql://localhost/asteriskcdrdbTest?user=root&password=advah310755");
@@ -115,7 +117,7 @@ public class PollerServiceTest {
                 "(1674,'2015-04-29 08:34:48','6108','6108','4376','OUT_LOCAL','SIP/6108-000009bf','SIP/288-000009c0','Dial','Sip/288/4376,90,tT',4,0,'BUSY',3,'','1430307288.3229','',NULL,NULL)," +
                 "(1675,'2015-04-29 08:34:58','6108','6108','4376','OUT_LOCAL','SIP/6108-000009c1','SIP/288-000009c2','Dial','Sip/288/4376,90,tT',4,0,'BUSY',3,'','1430307298.3231','',NULL,NULL)," +
                 "(1676,'2015-04-29 08:35:34','6108','6108','4376','OUT_LOCAL','SIP/6108-000009c4','SIP/288-000009c5','Dial','Sip/288/4376,90,tT',4,0,'BUSY',3,'','1430307334.3235','',NULL,NULL)," +
-                "(1677,'2015-04-29 08:35:11','6111','6111','030259500','OUT_LOCAL2','SIP/6111-000009c3','Khomp/B0C0-0.0','Dial','Khomp/b0l0/30259500,90,tT',83,68,'ANSWERED',3,'22401','1430307311.3233','\\\"P\\\"',NULL,NULL)," +
+                "(1677,'2015-04-29 08:35:11','6111','6111','030259500','OUT_LOCAL2','SIP/6111-000009c3','Khomp/B0C0-0.0','Dial','Khomp/b0l0/30259500,90,tT',383,368,'ANSWERED',3,'22401','1430307311.3233','\\\"P\\\"',NULL,NULL)," +
                 "(1678,'2015-04-29 08:36:49','3134755794','3134755794','035229540','OUT_LOCAL2','SIP/6111-000009c6','Khomp/B0C0-0.0','Hangup','',3,0,'FAILED',3,'22401','1430307409.3237','\\\"B\\\"',NULL,NULL)," +
                 "(1679,'2015-04-29 08:39:56','6108','6108','4376','OUT_LOCAL','SIP/6108-000009c7','SIP/288-000009c8','Dial','Sip/288/4376,90,tT',129,120,'ANSWERED',3,'','1430307596.3239','',NULL,NULL)," +
 
@@ -563,6 +565,33 @@ public class PollerServiceTest {
             br.readLine();
         }
         assertThat(br.readLine(), equalTo(sophoCalls.get(8).getFDCRStandardStringWithLessSpaces()));
+    }
 
+    @Test
+    public void callFileContentTestOCLFormat() throws Exception{
+        File testCallFile = new File("testCallFile.txt");
+        testCallFile.delete();
+        testCallFile.createNewFile();
+        FileWriter fileWritter = new FileWriter(testCallFile.getName(),true);
+        BufferedWriter bufferWritter = new BufferedWriter(fileWritter);
+        bufferWritter.write(SOME_HEADER);
+        bufferWritter.close();
+        fileWritter.close();
+        remoteServers.get(1).setName(DEFAULT_SERVER_NAME);
+        remoteServers.get(1).setAddress("127.0.0.1");
+        remoteServers.get(1).setDatabase("asteriskcdrdbTest");
+        remoteServers.get(1).setCallFile("testCallFile.txt");
+        remoteServers.get(1).setFileType("ocl");
+        List<SophoCall> sophoCalls = pollerService.pollServer(remoteServers.get(1));
+        assertThat(testCallFile.isFile(), equalTo(true));
+        assertThat(testCallFile.canRead(), equalTo(true));
+        BufferedReader br = new BufferedReader(new FileReader(testCallFile.getName()));
+        assertThat(br.readLine(), equalTo(SOME_HEADER));
+        assertThat(br.readLine(), equalTo(" 9608  Ramal 9608           27/04/2014 16:48  0213732318000                5          0.05"));
+        assertThat(br.readLine(), equalTo(" 9611  Ramal 9611           29/04/2015 08:35  30259500                   368          1.23"));
+//        for (int i = 0; i < 5; i++) {
+//            br.readLine();
+//        }
+//        assertThat(br.readLine(), equalTo(sophoCalls.get(8).getFDCRStandardStringWithLessSpaces()));
     }
 }

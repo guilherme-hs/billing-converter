@@ -18,6 +18,19 @@
         <property name="numberMap" ref="defaultNumberMap"></property>
         <property name="callFile" value="tenacity-calls.txt"></property>
         <property name="lessSpaces" value="true"></property>
+        <property name="fileType" value="sopho"></property>
+    </bean>
+
+    <bean class="com.tenacity.billing.RemoteServer" id="tenacity-gsm">
+        <property name="name" value="tenacity-GSM-Gateway"></property>
+        <property name="address" value="192.168.0.188"></property>
+        <property name="username" value="root"></property>
+        <property name="password" value="advah310755"></property>
+        <property name="database" value="asteriskcdrdb"></property>
+        <property name="port" value="3306"></property>
+        <property name="table" value="cdr"></property>
+        <property name="numberMap" ref="replaceNumberMap"></property>
+        <property name="callFile" value="tenacity-gsm-calls.txt"></property>
     </bean>
 
 
@@ -44,6 +57,7 @@
         <entry key="regex" value="^0([0-9*#]{8,9})$"></entry>
         <entry key="type" value="PSTN"></entry>
         <entry key="replacement" value="$1"></entry>
+        <entry key="minuteCost" value="0.2"></entry>
     </util:map>
 
     <util:map id="defaultCallerId" value-type="java.lang.String">
@@ -64,6 +78,7 @@
         <entry key="replacement" value="021$2"></entry>
         <entry key="route" value="001"></entry>
         <entry key="line" value="1000"></entry>
+        <entry key="minuteCost" value="0.6"></entry>
     </util:map>
 
     <util:list id="defaultNumberMap" value-type="java.util.Map">
@@ -75,6 +90,7 @@
 
     <util:list id="replaceNumberMap" value-type="java.util.Map">
         <ref bean="replaceExtension"></ref>
+        <ref bean="defaultLocal"></ref>
         <ref bean="replaceDDD"></ref>
     </util:list>
 

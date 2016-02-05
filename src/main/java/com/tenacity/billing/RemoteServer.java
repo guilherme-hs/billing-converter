@@ -43,7 +43,7 @@ public class RemoteServer {
     //indicates if the server uses less spaces in the conversion file
     private boolean lessSpaces = false;
 
-
+    private String fileType = "sopho";
 
 
     public String getName() {
@@ -132,6 +132,14 @@ public class RemoteServer {
 
     public void setLessSpaces(boolean lessSpaces) {
         this.lessSpaces = lessSpaces;
+    }
+
+    public String getFileType() {
+        return fileType;
+    }
+
+    public void setFileType(String fileType) {
+        this.fileType = fileType;
     }
 
     @Override

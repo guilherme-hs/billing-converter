@@ -8,7 +8,9 @@ import org.springframework.stereotype.Service;
 
 import java.io.*;
 import java.sql.*;
+import java.text.DateFormat;
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.Date;
 
@@ -37,6 +39,7 @@ public class PollerServiceImpl implements PollerService {
 
     protected DecimalFormat referenceNumberFormatter = new DecimalFormat("0000");
 
+    protected DateFormat oclDateFormatter = new SimpleDateFormat("dd/MM/yyyy HH:mm");
     protected int referenceNumber = INITIAL_REFERENCE_NUMBER;
 
     @Autowired
@@ -94,7 +97,7 @@ public class PollerServiceImpl implements PollerService {
             while (resultSet.next()) {
                 SophoCall sophoCall = new SophoCall();
 
-                int id = resultSet.getInt("Id");
+                long id = resultSet.getLong("Id");
                 sophoCall.setId("" + id);
                 //gets the date
                 Date date = resultSet.getTimestamp(CALLDATE_COLLUMN);
@@ -104,7 +107,6 @@ public class PollerServiceImpl implements PollerService {
                     referenceNumber = INITIAL_REFERENCE_NUMBER;
                 }
                 sophoCall.setReferenceNumber(referenceNumberFormatter.format(referenceNumber));
-
 
                 boolean srcRegexFound = false;
                 //tests the type of the src
@@ -168,7 +170,9 @@ public class PollerServiceImpl implements PollerService {
                                 if (userfield.equalsIgnoreCase("\"P\"")) {
                                     sophoCall.setPrivateCall(true);
                                 }
-
+                            }
+                            if (rules.get("minuteCost") != null){
+                                sophoCall.setCostPerMinute(Double.parseDouble(rules.get("minuteCost")));
                             }
                         }
                     }
@@ -311,7 +315,7 @@ public class PollerServiceImpl implements PollerService {
                 file.createNewFile();
             }
         } catch (IOException e) {
-            logger.warn("Error creating the call filethe callfile...", e);
+            logger.warn("Error creating the call file...", e);
         }
 
         BufferedWriter bufferWritter = null;
@@ -319,59 +323,11 @@ public class PollerServiceImpl implements PollerService {
         try {
             fileWritter = new FileWriter(file.getName(), true);
             bufferWritter = new BufferedWriter(fileWritter);
-            bufferWritter.newLine();
-            for (SophoCall sophoCall : sophoCalls) {
-                if (sophoCall != null && sophoCall.getPartyAtype() != null && sophoCall.getPartyBtype() != null) {
-                    //calls originated by internal numbers
-                    if (sophoCall.getPartyAtype().equals(SophoPartyType.EXTENSION)) {
-                        //internal to internal call
-                        if (sophoCall.getPartyBtype().equals(SophoPartyType.EXTENSION)) {
-                            if (remoteServer.isLessSpaces()) {
-                                bufferWritter.write(sophoCall.getFDCRStandardStringWithLessSpaces());
-                            } else {
-                                bufferWritter.write(sophoCall.getFDCRStandardString());
-                            }
-                        } else if (sophoCall.getPartyBtype().equals(SophoPartyType.PSTN)) {
-                            if (remoteServer.isLessSpaces()) {
-                                bufferWritter.write(sophoCall.getFDCRStandardStringWithLessSpaces());
-                                bufferWritter.newLine();
-                                bufferWritter.write(sophoCall.getFDCRAccountingStringWithLessSpaces());
-                            } else {
-                                bufferWritter.write(sophoCall.getFDCRStandardString());
-                                bufferWritter.newLine();
-                                bufferWritter.write(sophoCall.getFDCRAccountingString());
-                            }
-                        }
-                    } else if (sophoCall.getPartyAtype().equals(SophoPartyType.PSTN)) {
-                        //internal to internal call
-                        if (sophoCall.getPartyBtype().equals(SophoPartyType.EXTENSION)) {
-                            if (remoteServer.isLessSpaces()) {
-                                bufferWritter.write(sophoCall.getFDCRStandardStringWithLessSpaces());
-                            } else {
-                                bufferWritter.write(sophoCall.getFDCRStandardString());
-                            }
-                        } else if (sophoCall.getPartyBtype().equals(SophoPartyType.PSTN)) {
-                            if (remoteServer.isLessSpaces()) {
-                                bufferWritter.write(sophoCall.getFDCRStandardStringWithLessSpaces());
-                                bufferWritter.newLine();
-                                bufferWritter.write(sophoCall.getFDCRAccountingStringWithLessSpaces());
-                            } else {
-                                bufferWritter.write(sophoCall.getFDCRStandardString());
-                                bufferWritter.newLine();
-                                bufferWritter.write(sophoCall.getFDCRAccountingString());
-                            }
-                        }
-                    }
-                    bufferWritter.newLine();
-                }else{
-                    if(sophoCall != null){
-                        logger.info("Discarting call:"+sophoCall.toString());
-                    }else{
-                        logger.warn("Null SophoCall");
-                    }
-                }
+            if (remoteServer.getFileType().equalsIgnoreCase("sopho")) {
+                writeSophoCall(bufferWritter, sophoCalls, remoteServer);
+            } else if (remoteServer.getFileType().equalsIgnoreCase("ocl")) {
+                writeOCLCall(bufferWritter, sophoCalls, remoteServer);
             }
-
             bufferWritter.close();
             fileWritter.close();
         } catch (IOException e) {
@@ -387,7 +343,6 @@ public class PollerServiceImpl implements PollerService {
                 }
             }
         }
-
         prop.setProperty(remoteServer.getName(), "" + actualId);
         try {
             prop.store(output, null);
@@ -407,5 +362,90 @@ public class PollerServiceImpl implements PollerService {
         return sophoCalls;
     }
 
+
+    private void writeSophoCall(BufferedWriter bufferWritter, List<SophoCall> sophoCalls,
+                                RemoteServer remoteServer) throws IOException {
+        bufferWritter.newLine();
+        for (SophoCall sophoCall : sophoCalls) {
+            if (sophoCall != null && sophoCall.getPartyAtype() != null && sophoCall.getPartyBtype() != null) {
+                //calls originated by internal numbers
+                if (sophoCall.getPartyAtype().equals(SophoPartyType.EXTENSION)) {
+                    //internal to internal call
+                    if (sophoCall.getPartyBtype().equals(SophoPartyType.EXTENSION)) {
+                        if (remoteServer.isLessSpaces()) {
+                            bufferWritter.write(sophoCall.getFDCRStandardStringWithLessSpaces());
+                        } else {
+                            bufferWritter.write(sophoCall.getFDCRStandardString());
+                        }
+                    } else if (sophoCall.getPartyBtype().equals(SophoPartyType.PSTN)) {
+                        if (remoteServer.isLessSpaces()) {
+                            bufferWritter.write(sophoCall.getFDCRStandardStringWithLessSpaces());
+                            bufferWritter.newLine();
+                            bufferWritter.write(sophoCall.getFDCRAccountingStringWithLessSpaces());
+                        } else {
+                            bufferWritter.write(sophoCall.getFDCRStandardString());
+                            bufferWritter.newLine();
+                            bufferWritter.write(sophoCall.getFDCRAccountingString());
+                        }
+                    }
+                } else if (sophoCall.getPartyAtype().equals(SophoPartyType.PSTN)) {
+                    //internal to internal call
+                    if (sophoCall.getPartyBtype().equals(SophoPartyType.EXTENSION)) {
+                        if (remoteServer.isLessSpaces()) {
+                            bufferWritter.write(sophoCall.getFDCRStandardStringWithLessSpaces());
+                        } else {
+                            bufferWritter.write(sophoCall.getFDCRStandardString());
+                        }
+                    } else if (sophoCall.getPartyBtype().equals(SophoPartyType.PSTN)) {
+                        if (remoteServer.isLessSpaces()) {
+                            bufferWritter.write(sophoCall.getFDCRStandardStringWithLessSpaces());
+                            bufferWritter.newLine();
+                            bufferWritter.write(sophoCall.getFDCRAccountingStringWithLessSpaces());
+                        } else {
+                            bufferWritter.write(sophoCall.getFDCRStandardString());
+                            bufferWritter.newLine();
+                            bufferWritter.write(sophoCall.getFDCRAccountingString());
+                        }
+                    }
+                }
+                bufferWritter.newLine();
+            } else {
+                if (sophoCall != null) {
+                    logger.info("Discarting call:" + sophoCall.toString());
+                } else {
+                    logger.warn("Null Call");
+                }
+            }
+        }
+    }
+
+    private void writeOCLCall(BufferedWriter bufferWritter, List<SophoCall> sophoCalls,
+                              RemoteServer remoteServer) throws IOException {
+        bufferWritter.newLine();
+        for (SophoCall sophoCall : sophoCalls) {
+            if (sophoCall != null && sophoCall.getPartyAtype() != null && sophoCall.getPartyBtype() != null
+                    && sophoCall.getPartyAtype() == SophoPartyType.EXTENSION
+                    && sophoCall.getPartyBtype() == SophoPartyType.PSTN
+                    && sophoCall.getConversationDuration() > 0) {
+
+                bufferWritter.write(
+                        String.format("%5s", sophoCall.getPartyAFarEnd()) + "  " +
+                                String.format("%-19s", "Ramal " + sophoCall.getPartyAFarEnd())+ "  " +
+                                oclDateFormatter.format(sophoCall.getDate()) + "  " +
+                                String.format("%-20s", sophoCall.getDestination()) + "  " +
+                                String.format("%8d", sophoCall.getConversationDuration()) + "  " +
+                                String.format("%12.2f", sophoCall.getCostPerMinute()
+                                        * sophoCall.getConversationDuration()/60)
+                );
+                bufferWritter.newLine();
+            } else {
+                if (sophoCall != null) {
+                    logger.info("Discarting call:" + sophoCall.toString());
+                } else {
+                    logger.warn("Null Call");
+                }
+            }
+        }
+    }
 
 }
